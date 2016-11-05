@@ -1,0 +1,120 @@
+---
+title: "DATA_605_Assignmetn_11"
+author: "Md Jalal Uddin"
+date: "November 4, 2016"
+output: html_document
+---
+
+Problem: Perform a linear regression analysis fitting the Max Heart Rate to Age using the lm function in R. What is the resulting equation? Is the effect of Age on Max HR significant?What is the significance level? Please also plot the fitted relationship between Max HR and Age.
+
+Solution:
+
+```{r}
+# The following sample data are given
+
+(Age <- c(18,23,25,35,65,54,34,56,72,19,23,42,18,39,37))
+(MaxHR <- c(202,186,187,180,156,169,174,172,153,199,193,174,198,183,178)) 
+
+```
+
+```{r}
+# Finding summary, intercept and co-efficients of the data set. 
+Age_MaxHR_data <- data.frame(Age, MaxHR)
+
+summary(lm(MaxHR ~ Age, data = Age_MaxHR_data))
+
+(Coef_intercept <- lm(MaxHR ~ Age, data = Age_MaxHR_data))
+
+```
+
+From the above result we can conclude that, 
+the linear equation is: MaxHR^ = 210.0485 - 0.7977*Age
+The effect of Age on MaxHR is determined by r squared value= 0.9091. F-statistic is 130 with 13 DF and p-value is 3.848e-08
+
+```{r}
+# Developing a ggplot with given data set. 
+library (ggplot2)
+ggplot(Age_MaxHR_data, aes(x=Age, y=MaxHR)) +
+  geom_point(aes(color = MaxHR)) +
+   geom_smooth(method ="lm") +
+  ggtitle("Relationship between Age and MaxHR") +
+  xlab("Age") +
+  ylab("MaxHR") +
+  theme_bw()
+#Source:http://docs.ggplot2.org/dev/vignettes/themes.html
+
+```
+
+Problem: Using the Auto data set from Assignment 5 perform a Linear Re-gression analysis using mpg as the dependent variable and the other 4 (displacement, horse-power, weight, acceleration) as independent variables. What is the final linear regression fit equation? Which of the 4 independent variables have a significant impact on mpg? What are their corresponding significance levels? What are the standard errors on each of the coeficients? Please perform this experiment in two ways. First take any random 40 data points from the entire auto data sample and perform the linear regression fit and measure the 95% confidence intervals. Then, take the entire data set (all 392 points) and perform linear regression and measure the 95% confidence intervals. Please report the resulting fit equation, their significance values and confidence intervals for each of the two runs.
+
+Solution:
+
+```{r}
+#read auto-mpg data using read.csv 
+
+auto_mpg_data1 <- read.csv("C:/Users/sql_ent_svc/Desktop/MSDA Assignment/DATA_605/Assignment_11/auto-mpg.data", sep = "", header = FALSE)
+
+names(auto_mpg_data1) = c("mpg", "displacement", "horsepower", "weight", "acceleration")
+
+```
+
+```{r}
+#finding regression intercept and co-efficient values
+auto_mpg_data_lm = lm(mpg ~ displacement + horsepower + weight + acceleration, data = auto_mpg_data1)
+auto_mpg_data_lm_summary = summary(auto_mpg_data_lm)
+auto_mpg_data_lm_summary
+auto_mpg_data_lm_summary$coefficients[,1]
+
+```
+
+From the above resurl, the liner regression fit equation is: mpg^ = -55.47963630 + 0.63155975x  displacement + 0.08281334xhorsepower - 3.51392367xweight-0.34375687xacceleration
+from the above four variable we can see, the variable weight has a signivican negative impact on mpg.
+we can find corresponding significance levels and standard error of the coefficient from the value of auto auto_mpg_data_lm_summary and auto_mpg_data_lm_summary.
+
+```{r}
+# finding 95% Confidence Interval
+confint(auto_mpg_data_lm, level = 0.95)
+
+
+```
+
+Now I am drawing a sample of 40 observation from the auto-mpg data set 
+
+```{r}
+#draw Sample data set of 40 observation from auto.mpg data set
+set.seed(40)
+auto_data_set = auto_mpg_data1[sample(1:length(auto_mpg_data1[, 1]), 40, replace = F), ]
+
+auto_data_set_lm = lm(mpg ~ displacement + horsepower + weight + acceleration, data = auto_data_set)
+auto_data_set_lm_summary = summary(auto_data_set_lm)
+auto_data_set_lm_summary$coefficients
+auto_data_set_lm_summary$coefficients[,1]
+
+```
+
+From the above resurl, the liner regression equation for auto sample from the auto-mpg dataset is: mpg^ = -145.1003106 - 0.3442292xdisplacement + 0.1353775xhorsepower - 4.2385808xweight + 1.6670342xacceleration
+from the above four variables we can see, the variable weight has a significant negative impact on mpg.
+we can find corresponding significance levels and standard error of the coefficient from the value of auto auto_mpg_data_lm_summary and auto_mpg_data_lm_summary.
+
+```{r}
+# finding 95% Confidence Interval for the sample data set
+confint(auto_data_set_lm, level = 0.95)
+
+```
+
+Now finding the summary of both auto-mpg data set and sample of auto-mpg data set to compare the result. 
+
+```{r}
+#summary of auto_mpg data set
+auto_mpg_data_lm_summary
+
+```
+
+
+```{r}
+#summary of auto_mpg sample data set
+auto_data_set_lm_summary
+
+```
+
+From the above summary of both data sets we can see, r-squared and p-value are almost same, median, std.error and t values are slightly differ. 
